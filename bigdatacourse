@@ -1,0 +1,88 @@
+import Tree.Empty
+
+import scala.collection.immutable.Stream.Empty
+
+
+sealed trait Tree[+A] {
+  //Размер двоичного дерева определяется числом содержащихся в нем внутренних узлов.
+  def size: Int
+  //Максимальное расстояние от корня до листа
+  def depth: Int
+
+  def map[B](f: A => B): Tree[B]
+
+  def filter(f: A => Boolean): Tree[A]
+
+  def fold[B](map: A => B)(reduce: (B, B) => B): B
+}
+
+//Узел, не имеющий детей (E, G, H, I, J), называется листом (leaf)
+case class Leaf[A](value: A) extends Tree[A] {
+
+  override def size: Int =  1
+
+  override def depth: Int = {
+    def loop(t: Tree[A]) :Int = t match {
+      case value: A => 1
+      case _ => 0
+    }
+    loop(this) - 1
+  }
+
+  //x => exists[A](set, value => x == f(value))(range)
+  override def map[B](f: A => B): Tree[B] = {
+    map(f)
+  }
+
+  override def filter(f: A => Boolean): Tree[A] = {
+     x => x == f(x)
+
+  }
+
+
+  override def fold[B](map: A => B)(reduce: (B, B) => B): B = {
+    this.map(map)(reduce())
+  }
+}
+
+  //scala> Map('a' -> 1, 'b' -> 2)
+  //res4: scala.collection.immutable.Map[Char,Int] = Map((a,1), (b,2))
+
+
+case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A] {
+  override def size: Int =  {
+    case Empty => 0
+    case Branch(left, right) => left.size + right.size
+  }
+/*def leafCount[T](t: Tree[T]): Int = t match {
+  case Empty => 0
+  case Node(e, Empty, Empty) => 1
+  case Node(e, left, right) => leafCount(left) + leafCount(right)
+}
+*/
+  override def depth: Int = {
+
+    def loop(t: Tree[A]): Int = t match{
+      case value: A => Seq(loop(left), loop(right)).max + 1
+      case _          => 0
+    }
+    loop(this) - 1
+  }
+// new Node(f(v), l.map(n => n.map(f)), r.map(n => n.map(f)))
+  override def map[B](f: A => B): Tree[B] = {
+    Branch(left.map(f), right.map(f))
+  }
+
+  override def filter(f: A => Boolean): Tree[A] = {
+    x => f(x)
+  }
+  // x => set(x) && f(x)
+  // case (n: Node[A]) :: tl => foldLoop(o(n, tl), z)(f)(o) // never directly evaluate nodes, function o will create new accumulator
+  override def fold[B](map: A => B)(reduce: (B, B) => B): B = {
+    this.map(map)(reduce())
+  }
+}
+
+object Tree {
+
+}
