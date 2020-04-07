@@ -24,7 +24,7 @@ object AviaInfoParameters {
 
 
 
-  private def createTable(name: String, structType: StructType, path: String, delimiter: String = "\\t")
+  private def createTable(name: String, structType: StructType, path: String, delimiter: String = ",")
                          (implicit spark: SparkSession): Unit = {
     spark.read
       .format("com.databricks.spark.csv")

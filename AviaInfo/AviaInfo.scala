@@ -15,7 +15,7 @@ object AviaInfo extends App{
 
 
   val sparkConf = new SparkConf()
-    .setAppName("aviainfo")
+    .setAppName("spark-example")
     .setMaster("local[*]")
   val sc = new SparkContext(sparkConf)
   val params: AviaInfoParameters.type = AviaInfoParameters
@@ -32,17 +32,16 @@ object AviaInfo extends App{
     case(numOfProducts, count) => (numOfProducts + record._1,count)
   }
 
-  airport.map{
-    case Airports(_,name,city,country,iata,_,_,_,_,_,_,_,_,_) => ((iata,name),(country,city))
-  }.repartition(1).saveAsTextFile(AviaInfoParameters.EXAMPLE_OUTPUT_PATH + "aviainfo")
+  //
+
   airline.map{
    case Airline(_,name,_,_,_,_,country,_) => (name, country)
-  }
+  }.repartition(1).saveAsTextFile(AviaInfoParameters.EXAMPLE_OUTPUT_PATH + "aviainfo")
 
   routes.map{
     case Route(_,_,source_airport,_,target_airport,_,_,_,_) => (source_airport,target_airport)
   }
 
-
+//case Airports(_,name,city,country,iata,_,_,_,_,_,_,_,_,_) => ((iata,name),(country,city))
 }
 //
